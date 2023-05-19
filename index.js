@@ -76,6 +76,27 @@ const result = await totalToyCarCollection.find({sellerEmail:req.params.email}).
 res.send(result)
 })
 
+app.put('/myToyUpdate/:id', async(req,res)=>{
+const id = req.params.id;
+const body = req.body;
+const filter = { _id: new ObjectId(id)}
+const updateDoc = {
+$set:{
+photo:body.photo,
+ toyName:body.toyName,
+ sellerName:body.sellerName,
+sellerEmail:body.sellerEmail,
+ subCategory:body.subCategory,
+ price:body.price,
+ rating:body.rating,
+ quantity:body.quantity,
+ details:body.details
+},
+};
+const result = await totalToyCarCollection.updateOne(filter,updateDoc);
+res.send(result)
+})
+
 app.delete('/myToy/:id', async(req, res)=>{
 const body = req.params.id;
 const filter = {_id: new ObjectId(body)};
