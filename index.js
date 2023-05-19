@@ -32,6 +32,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 const totalToyCarCollection = client.db('toyCars').collection('totalCarToys');
+// search system all toys
+const indexkeys = { toyName: 1, subCategory: 1 };
+const indexOptions = { name: "toyNameSubCategory"}
+
+const result = await totalToyCarCollection.createIndex(indexkeys,indexOptions);
+app.get('/allToySearchName/:text', async(req,res)=>{
+const searchText = req.params.text;
+const result = await  totalToyCarCollection.find({
+$or: [
+{toyName:{$regex:searchText, $options:'i'} },
+{subCategory:{$regex:searchText, $options:'i'} }
+]
+}).toArray()
+res.send(result)
+})
+
 
 app.post('/addToy', async(req, res)=>{
 const body = req.body;
@@ -40,6 +56,7 @@ console.log(body)
 const result = await totalToyCarCollection.insertOne(body);
 res.send(result)
 })
+
 
 app.get('/allToy', async(req, res)=>{
 const result = await totalToyCarCollection.find({}).toArray();
@@ -53,6 +70,18 @@ const result = await totalToyCarCollection.findOne(filter);
 res.send(result)
 })
 
+app.get('/myToy/:email', async(req, res)=>{
+console.log(req.params.email)
+const result = await totalToyCarCollection.find({sellerEmail:req.params.email}).toArray();
+res.send(result)
+})
+
+app.delete('/myToy/:id', async(req, res)=>{
+const body = req.params.id;
+const filter = {_id: new ObjectId(body)};
+const result = await totalToyCarCollection.deleteOne(filter);
+res.send(result)
+})
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
